@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Double Eighth Note with Curved Beam -->
+    <path
+        android:pathData="M48,32 L68,27 C70.2,26.5 72,28.2 72,30.5 L72,56.2 C69.8,55 67,54.4 64,54.8 C58.5,55.5 54.5,60 55.2,65 C55.9,70 61,73.5 66.5,72.8 C71.5,72.1 75,68 75,63.5 L75,34 L52,39 L52,64.2 C49.8,63 47,62.4 44,62.8 C38.5,63.5 34.5,68 35.2,73 C35.9,78 41,81.5 46.5,80.8 C51.5,80.1 55,76 55,71.5 L55,34 C55,32.7 54.2,31.6 53,31.3 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="35"
+                android:startY="27"
+                android:endX="75"
+                android:endY="80"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF8A65" />
+                <item android:offset="0.5" android:color="#FF6F61" />
+                <item android:offset="1.0" android:color="#F06292" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Left Sound Wave Arc -->
+    <path
+        android:pathData="M28,45 C25,50 25,60 28,65"
+        android:strokeWidth="3.2"
+        android:strokeColor="#80FFA726"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- Right Sound Wave Arc -->
+    <path
+        android:pathData="M82,40 C86,47 86,63 82,70"
+        android:strokeWidth="3.2"
+        android:strokeColor="#80FF6F61"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+</vector>

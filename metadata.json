@@ -1,0 +1,6 @@
+{
+  "name": "Gugak",
+  "description": "Pixel-inspired music player with local offline discovery, unified offline & online search, and music streaming & sync from Pixabay, Free Music Archive, Audius, and Internet Archive.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
