@@ -35,7 +35,7 @@ import com.example.ui.components.SongListItem
 import kotlinx.coroutines.launch
 
 enum class SearchFilter {
-    ALL, OFFLINE, AUDIUS, ARCHIVE, PIXABAY, FMA
+    ALL, OFFLINE, AUDIUS, ARCHIVE, PIXABAY, FMA, PODCAST, SPOTIFY
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -89,6 +89,8 @@ fun SearchScreen(
             SearchFilter.ARCHIVE -> onlineResults.filter { it.source == "Internet Archive" }
             SearchFilter.PIXABAY -> onlineResults.filter { it.source == "Pixabay Music" }
             SearchFilter.FMA -> onlineResults.filter { it.source == "Free Music Archive" }
+            SearchFilter.PODCAST -> onlineResults.filter { it.source == "Podcast Index" }
+            SearchFilter.SPOTIFY -> onlineResults.filter { it.source == "Spotify" }
         }
     }
 
@@ -196,6 +198,22 @@ fun SearchScreen(
                         leadingIcon = { Icon(Icons.Default.Public, contentDescription = null, modifier = Modifier.size(16.dp)) }
                     )
                 }
+                item {
+                    FilterChip(
+                        selected = selectedFilter == SearchFilter.PODCAST,
+                        onClick = { selectedFilter = SearchFilter.PODCAST },
+                        label = { Text("Podcasts") },
+                        leadingIcon = { Icon(Icons.Default.Podcasts, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                    )
+                }
+                item {
+                    FilterChip(
+                        selected = selectedFilter == SearchFilter.SPOTIFY,
+                        onClick = { selectedFilter = SearchFilter.SPOTIFY },
+                        label = { Text("Spotify") },
+                        leadingIcon = { Icon(Icons.Default.MusicNote, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                    )
+                }
             }
 
             if (isOnlineLoading) {
@@ -286,7 +304,9 @@ fun SearchScreen(
                         Triple("Pixabay Music", "Royalty-free lofi, cinematic, acoustic & beats", Icons.Default.Audiotrack),
                         Triple("Free Music Archive", "High-quality legal CC & public domain indie music", Icons.Default.LibraryMusic),
                         Triple("Audius Network", "Trending indie electronic, hip-hop & alternative tracks", Icons.Default.Headphones),
-                        Triple("Internet Archive", "Live concerts, classical recordings & audiobooks", Icons.Default.Public)
+                        Triple("Internet Archive", "Live concerts, classical recordings & audiobooks", Icons.Default.Public),
+                        Triple("Podcast Index", "Live podcasts across tech, music, comedy & news", Icons.Default.Podcasts),
+                        Triple("Spotify", "Stream preview hits, global top charts & discover songs", Icons.Default.MusicNote)
                     )
 
                     items(sourcesInfo) { (name, desc, icon) ->
@@ -601,6 +621,8 @@ fun SourceBadge(source: String) {
         "Free Music Archive" -> Color(0xFF009688).copy(alpha = 0.18f) to Color(0xFF00796B)
         "Audius" -> Color(0xFF8A2BE2).copy(alpha = 0.18f) to Color(0xFF7B1FA2)
         "Internet Archive" -> Color(0xFFFF9800).copy(alpha = 0.18f) to Color(0xFFE65100)
+        "Podcast Index" -> Color(0xFFE91E63).copy(alpha = 0.18f) to Color(0xFFC2185B)
+        "Spotify" -> Color(0xFF1DB954).copy(alpha = 0.18f) to Color(0xFF1ED760)
         else -> MaterialTheme.colorScheme.surfaceContainerHighest to MaterialTheme.colorScheme.onSurfaceVariant
     }
 

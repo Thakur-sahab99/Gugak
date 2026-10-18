@@ -130,61 +130,6 @@ fun HomeScreen(
                 }
             }
 
-            // Online Music Sync Banner (Pixabay, Free Music Archive, Audius, Internet Archive)
-            item {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .clickable(onClick = onNavigateToOnlineMusic),
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    tonalElevation = 2.dp
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Surface(
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(42.dp)
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    Icons.Default.Public,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSecondary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.width(12.dp))
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "Online Music Hub",
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                            Text(
-                                "Pixabay, Free Music Archive, Audius & Archive.org",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
-                            )
-                        }
-
-                        FilledTonalButton(
-                            onClick = onNavigateToOnlineMusic,
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text("Explore")
-                        }
-                    }
-                }
-            }
-
             // Hero Pixel Card
             item {
                 Surface(
@@ -203,7 +148,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "${allSongs.size} tracks in library • Cloud & Online Sync enabled",
+                            text = "${allSongs.size} tracks in library • Offline & Online Music",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                         )

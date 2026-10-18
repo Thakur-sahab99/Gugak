@@ -422,4 +422,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isFinishing) {
+            val app = application as? GugakApplication
+            app?.playbackController?.stop()
+        }
+    }
 }

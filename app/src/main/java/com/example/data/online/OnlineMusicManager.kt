@@ -21,6 +21,8 @@ class OnlineMusicManager(
     private val archiveClient = InternetArchiveApiClient()
     private val pixabayClient = PixabayApiClient()
     private val fmaClient = FreeMusicArchiveApiClient()
+    private val podcastClient = PodcastIndexApiClient()
+    private val spotifyClient = SpotifyApiClient()
 
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
@@ -40,6 +42,12 @@ class OnlineMusicManager(
 
     private val _fmaTracks = MutableStateFlow<List<OnlineTrack>>(emptyList())
     val fmaTracks: StateFlow<List<OnlineTrack>> = _fmaTracks.asStateFlow()
+
+    private val _podcastTracks = MutableStateFlow<List<OnlineTrack>>(emptyList())
+    val podcastTracks: StateFlow<List<OnlineTrack>> = _podcastTracks.asStateFlow()
+
+    private val _spotifyTracks = MutableStateFlow<List<OnlineTrack>>(emptyList())
+    val spotifyTracks: StateFlow<List<OnlineTrack>> = _spotifyTracks.asStateFlow()
 
     private val _searchResults = MutableStateFlow<List<OnlineTrack>>(emptyList())
     val searchResults: StateFlow<List<OnlineTrack>> = _searchResults.asStateFlow()
@@ -67,16 +75,22 @@ class OnlineMusicManager(
                 val archiveDeferred = async { archiveClient.getPopularArchiveAudio() }
                 val pixabayDeferred = async { pixabayClient.getPopularMusic() }
                 val fmaDeferred = async { fmaClient.getCuratedTracks() }
+                val podcastDeferred = async { podcastClient.getPopularPodcasts() }
+                val spotifyDeferred = async { spotifyClient.getPopularTracks() }
 
                 val audiusList = audiusDeferred.await()
                 val archiveList = archiveDeferred.await()
                 val pixabayList = pixabayDeferred.await()
                 val fmaList = fmaDeferred.await()
+                val podcastList = podcastDeferred.await()
+                val spotifyList = spotifyDeferred.await()
 
                 _audiusTracks.value = audiusList
                 _archiveTracks.value = archiveList
                 _pixabayTracks.value = pixabayList
                 _fmaTracks.value = fmaList
+                _podcastTracks.value = podcastList
+                _spotifyTracks.value = spotifyList
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -98,8 +112,15 @@ class OnlineMusicManager(
                 val archiveDeferred = async { archiveClient.getPopularArchiveAudio(query) }
                 val pixabayDeferred = async { pixabayClient.searchTracks(query) }
                 val fmaDeferred = async { fmaClient.searchTracks(query) }
+                val podcastDeferred = async { podcastClient.searchPodcasts(query) }
+                val spotifyDeferred = async { spotifyClient.searchTracks(query) }
 
-                val combined = audiusDeferred.await() + archiveDeferred.await() + pixabayDeferred.await() + fmaDeferred.await()
+                val combined = audiusDeferred.await() +
+                        archiveDeferred.await() +
+                        pixabayDeferred.await() +
+                        fmaDeferred.await() +
+                        podcastDeferred.await() +
+                        spotifyDeferred.await()
                 _searchResults.value = combined
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -72,9 +72,7 @@ class PlaybackController(
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> mediaPlayer?.setVolume(0.2f, 0.2f)
             AudioManager.AUDIOFOCUS_GAIN -> {
                 mediaPlayer?.setVolume(1.0f, 1.0f)
-                if (!_state.value.isPlaying && _state.value.currentSong != null) {
-                    play()
-                }
+                // Don't auto-start the music after ending a phone call or regaining focus
             }
         }
     }

@@ -104,9 +104,9 @@ fun OnboardingScreen(
                 )
 
                 FeatureItem(
-                    icon = Icons.Outlined.Lock,
-                    title = "100% Offline & Private",
-                    description = "No accounts, no telemetry, no tracking. Your audio never leaves your device."
+                    icon = Icons.Default.Podcasts,
+                    title = "Music, Podcasts & Streaming",
+                    description = "Discover podcasts, streaming tracks, and seamlessly play your local library."
                 )
 
                 FeatureItem(

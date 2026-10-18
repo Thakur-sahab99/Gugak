@@ -23,6 +23,23 @@ class MusicPlaybackService : Service() {
         createNotificationChannel()
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        try {
+            val app = application as? GugakApplication
+            app?.playbackController?.stop()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+        stopSelf()
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val app = application as? GugakApplication
         val controller = app?.playbackController

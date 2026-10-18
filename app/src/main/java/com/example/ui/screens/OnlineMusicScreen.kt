@@ -33,7 +33,7 @@ import com.example.ui.components.EqualizerWaveAnimation
 import kotlinx.coroutines.launch
 
 enum class OnlineSourceTab {
-    PIXABAY, FMA, AUDIUS, INTERNET_ARCHIVE, SYNCED
+    PIXABAY, FMA, AUDIUS, INTERNET_ARCHIVE, PODCAST_INDEX, SPOTIFY, SYNCED
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,6 +56,8 @@ fun OnlineMusicScreen(
     val fmaTracks by onlineManager.fmaTracks.collectAsState()
     val audiusTracks by onlineManager.audiusTracks.collectAsState()
     val archiveTracks by onlineManager.archiveTracks.collectAsState()
+    val podcastTracks by onlineManager.podcastTracks.collectAsState()
+    val spotifyTracks by onlineManager.spotifyTracks.collectAsState()
     val searchResults by onlineManager.searchResults.collectAsState()
     val isLoading by onlineManager.isLoading.collectAsState()
     val syncingTrackId by onlineManager.syncingTrackId.collectAsState()
@@ -96,7 +98,7 @@ fun OnlineMusicScreen(
                         Column {
                             Text("Online Music Hub", style = MaterialTheme.typography.titleLarge)
                             Text(
-                                "Pixabay, FMA, Audius & Archive.org",
+                                "Pixabay, FMA, Audius, Podcasts & Spotify",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -181,6 +183,18 @@ fun OnlineMusicScreen(
                     icon = { Icon(Icons.Default.Public, contentDescription = null, modifier = Modifier.size(18.dp)) }
                 )
                 Tab(
+                    selected = selectedTab == OnlineSourceTab.PODCAST_INDEX,
+                    onClick = { selectedTab = OnlineSourceTab.PODCAST_INDEX },
+                    text = { Text("Podcasts (${podcastTracks.size})") },
+                    icon = { Icon(Icons.Default.Podcasts, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                )
+                Tab(
+                    selected = selectedTab == OnlineSourceTab.SPOTIFY,
+                    onClick = { selectedTab = OnlineSourceTab.SPOTIFY },
+                    text = { Text("Spotify (${spotifyTracks.size})") },
+                    icon = { Icon(Icons.Default.MusicNote, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                )
+                Tab(
                     selected = selectedTab == OnlineSourceTab.SYNCED,
                     onClick = { selectedTab = OnlineSourceTab.SYNCED },
                     text = { Text("Synced (${syncedOnlineSongs.size})") },
@@ -201,6 +215,8 @@ fun OnlineMusicScreen(
                 selectedTab == OnlineSourceTab.FMA -> fmaTracks
                 selectedTab == OnlineSourceTab.AUDIUS -> audiusTracks
                 selectedTab == OnlineSourceTab.INTERNET_ARCHIVE -> archiveTracks
+                selectedTab == OnlineSourceTab.PODCAST_INDEX -> podcastTracks
+                selectedTab == OnlineSourceTab.SPOTIFY -> spotifyTracks
                 else -> emptyList()
             }
 
