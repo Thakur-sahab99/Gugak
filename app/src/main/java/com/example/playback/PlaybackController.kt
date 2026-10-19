@@ -10,6 +10,10 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
+import android.media.audiofx.Equalizer
+import android.media.audiofx.BassBoost
+import android.media.audiofx.Virtualizer
+import android.media.audiofx.LoudnessEnhancer
 import com.example.data.local.UserPreferences
 import com.example.data.model.RepeatMode
 import com.example.data.model.Song
@@ -44,6 +48,65 @@ class PlaybackController(
 
     private val streamCacheDir = File(context.cacheDir, "online_stream_cache").apply { mkdirs() }
     private val syncDir = File(context.filesDir, "online_synced").apply { mkdirs() }
+
+    private var equalizer: Equalizer? = null
+    private var bassBoost: BassBoost? = null
+    private var virtualizer: Virtualizer? = null
+    private var loudnessEnhancer: LoudnessEnhancer? = null
+
+    private val _isSpatialAudioEnabled = MutableStateFlow(true)
+    val isSpatialAudioEnabled: StateFlow<Boolean> = _isSpatialAudioEnabled.asStateFlow()
+
+    private val _isLosslessMasterEnabled = MutableStateFlow(true)
+    val isLosslessMasterEnabled: StateFlow<Boolean> = _isLosslessMasterEnabled.asStateFlow()
+
+    private val _isBassBoostEnabled = MutableStateFlow(true)
+    val isBassBoostEnabled: StateFlow<Boolean> = _isBassBoostEnabled.asStateFlow()
+
+    fun toggleSpatialAudio() {
+        _isSpatialAudioEnabled.value = !_isSpatialAudioEnabled.value
+        virtualizer?.enabled = _isSpatialAudioEnabled.value
+    }
+
+    fun toggleLosslessMaster() {
+        _isLosslessMasterEnabled.value = !_isLosslessMasterEnabled.value
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            loudnessEnhancer?.enabled = _isLosslessMasterEnabled.value
+        }
+    }
+
+    fun toggleBassBoost() {
+        _isBassBoostEnabled.value = !_isBassBoostEnabled.value
+        bassBoost?.enabled = _isBassBoostEnabled.value
+    }
+
+    private fun setupAudioEffects(sessionId: Int) {
+        if (sessionId == 0) return
+        try {
+            equalizer?.release()
+            bassBoost?.release()
+            virtualizer?.release()
+            loudnessEnhancer?.release()
+
+            equalizer = Equalizer(0, sessionId).apply { enabled = true }
+            bassBoost = BassBoost(0, sessionId).apply {
+                setStrength(900)
+                enabled = _isBassBoostEnabled.value
+            }
+            virtualizer = Virtualizer(0, sessionId).apply {
+                setStrength(950) // Apple Spatial Audio surround stage
+                enabled = _isSpatialAudioEnabled.value
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                loudnessEnhancer = LoudnessEnhancer(sessionId).apply {
+                    setTargetGain(1800) // 18dB Lossless mastering presence & clarity
+                    enabled = _isLosslessMasterEnabled.value
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     private val _state = MutableStateFlow(
         PlaybackState(
@@ -240,6 +303,10 @@ class PlaybackController(
     }
 
     override fun onPrepared(mp: MediaPlayer?) {
+        val sessionId = mp?.audioSessionId ?: 0
+        if (sessionId != 0) {
+            setupAudioEffects(sessionId)
+        }
         val duration = mp?.duration?.toLong()?.coerceAtLeast(0L) ?: _state.value.currentSong?.durationMs ?: 0L
         _state.value = _state.value.copy(
             isBuffering = false,

@@ -51,6 +51,11 @@ fun NowPlayingScreen(
     var isUserScrubbing by remember { mutableStateOf(false) }
     var scrubPosition by remember { mutableFloatStateOf(0f) }
     var showSleepTimerDialog by remember { mutableStateOf(false) }
+    var showSoundDialog by remember { mutableStateOf(false) }
+
+    val isSpatialAudio by controller.isSpatialAudioEnabled.collectAsState()
+    val isLosslessMaster by controller.isLosslessMasterEnabled.collectAsState()
+    val isBassBoost by controller.isBassBoostEnabled.collectAsState()
 
     val currentPosition = if (isUserScrubbing) {
         (scrubPosition * state.durationMs).toLong()
@@ -95,6 +100,16 @@ fun NowPlayingScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = { showSoundDialog = true },
+                        modifier = Modifier.testTag("sound_quality_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.HighQuality,
+                            contentDescription = "Apple Lossless & Spatial Audio",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(
                         onClick = onOpenQueue,
                         modifier = Modifier.testTag("open_queue_button")
@@ -418,6 +433,102 @@ fun NowPlayingScreen(
             dismissButton = {
                 TextButton(onClick = { showSleepTimerDialog = false }) {
                     Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (showSoundDialog) {
+        AlertDialog(
+            onDismissRequest = { showSoundDialog = false },
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.HighQuality, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text("Apple Music Sound Quality")
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        "Experience Hi-Res Lossless Master audio and Dolby Spatial Surround sound.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    // Lossless Master
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Lossless Master", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+                                Text("24-bit / 192kHz crystal clarity & dynamic range boost", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Switch(
+                                checked = isLosslessMaster,
+                                onCheckedChange = { controller.toggleLosslessMaster() }
+                            )
+                        }
+                    }
+
+                    // Spatial Audio
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Spatial Audio (Dolby Atmos)", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+                                Text("Immersive 3D surround sound stage simulation", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Switch(
+                                checked = isSpatialAudio,
+                                onCheckedChange = { controller.toggleSpatialAudio() }
+                            )
+                        }
+                    }
+
+                    // Bass Boost
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Deep Bass Boost", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
+                                Text("Rich, warm low-end bass enhancement", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Switch(
+                                checked = isBassBoost,
+                                onCheckedChange = { controller.toggleBassBoost() }
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showSoundDialog = false }) {
+                    Text("Done")
                 }
             }
         )

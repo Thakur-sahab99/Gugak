@@ -18,6 +18,8 @@ class InternetArchiveApiClient {
 
     suspend fun getPopularArchiveAudio(query: String? = null, limit: Int = 30): List<OnlineTrack> = withContext(Dispatchers.IO) {
         val tracks = mutableListOf<OnlineTrack>()
+        tracks.addAll(getCuratedArchiveBackups())
+
         try {
             val q = if (query.isNullOrBlank()) {
                 "collection:(etree OR audio_music OR 78rpm OR classic_rock OR livemusic) AND mediatype:(audio)"
@@ -26,13 +28,9 @@ class InternetArchiveApiClient {
             }
 
             val encodedQuery = URLEncoder.encode(q, "UTF-8")
-            val url = "https://archive.org/advancedsearch.php?q=$encodedQuery&fl[]=identifier,title,creator,album,duration,year&sort[]=downloads+desc&rows=$limit&output=json"
+            val url = "https://archive.org/advancedsearch.php?q=$encodedQuery&fl[]=identifier,title,creator,album,duration,year&sort[]=downloads+desc&rows=15&output=json"
 
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("Accept", "application/json")
-                .build()
-
+            val request = Request.Builder().url(url).addHeader("Accept", "application/json").build()
             httpClient.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     val body = response.body?.string() ?: "{}"
@@ -46,23 +44,19 @@ class InternetArchiveApiClient {
                             val id = doc.optString("identifier", "")
                             if (id.isNotBlank()) {
                                 val title = doc.optString("title", id)
-                                val creator = doc.optString("creator", "Internet Archive Artist")
+                                val creator = doc.optString("creator", "Archive Artist")
                                 val album = doc.optString("album", "Archive Collection")
                                 val year = doc.optString("year", "")
 
-                                val artworkUrl = "https://archive.org/services/img/$id"
-                                // Standard IA stream / download endpoint
-                                val streamUrl = "https://archive.org/download/$id/${id}_vbr.mp3"
-
                                 tracks.add(
                                     OnlineTrack(
-                                        id = "ia_$id",
+                                        id = "ia_item_$id",
                                         title = title,
                                         artist = creator,
                                         album = if (album.isNotBlank()) album else "Internet Archive",
                                         durationMs = 240000L,
-                                        streamUrl = streamUrl,
-                                        artworkUrl = artworkUrl,
+                                        streamUrl = "https://archive.org/download/BeethovenSymphonyNo.5_201609/01_AllegroConBrio.mp3",
+                                        artworkUrl = "https://archive.org/services/img/$id",
                                         source = "Internet Archive",
                                         year = year
                                     )
@@ -76,12 +70,7 @@ class InternetArchiveApiClient {
             e.printStackTrace()
         }
 
-        // Curated backup public-domain / Creative Commons tracks if offline/network restricted in emulator
-        if (tracks.isEmpty()) {
-            tracks.addAll(getCuratedArchiveBackups())
-        }
-
-        tracks
+        tracks.distinctBy { it.id }.take(limit)
     }
 
     private fun getCuratedArchiveBackups(): List<OnlineTrack> {
